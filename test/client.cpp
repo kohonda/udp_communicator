@@ -1,4 +1,5 @@
 #include "udp_lib.hpp"
+#include "msg_A.hpp"
 
 int main()
 {
@@ -7,12 +8,12 @@ int main()
 
     client.udp_bind();
 
-    char msg[100];
+    msg_A msg;
 
     while (1)
     {
-        client.udp_receive(msg);
-        std::cout << std::string(msg) << std::endl;
+        client.udp_receive(&msg);
+        std::cout << msg.type << std::endl;
     }
     return 0;
 }

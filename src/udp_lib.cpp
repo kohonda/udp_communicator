@@ -6,27 +6,27 @@ namespace udp
     {
         // Generate socket
         // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
-        sock = socket(AF_INET, SOCK_DGRAM, 0);
-        if (sock < 0)
+        sock_ = socket(AF_INET, SOCK_DGRAM, 0);
+        if (sock_ < 0)
         {
             std::cerr << "[Error] Socket initialize error." << std::endl;
             exit(0);
         }
 
         // IP/port setting
-        addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = inet_addr(address.c_str());
-        addr.sin_port = htons(port);
+        addr_.sin_family = AF_INET;
+        addr_.sin_addr.s_addr = inet_addr(address.c_str());
+        addr_.sin_port = htons(port);
     }
 
     UDPLib::~UDPLib()
     {
-        close(sock);
+        close(sock_);
     }
 
     void UDPLib::udp_send(const void *msg, const size_t length) const
     {
-        if (sendto(sock, msg, length, 0, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+        if (sendto(sock_, msg, length, 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
         {
             std::cerr << "[Error] UDP send Error." << std::endl;
             exit(1);
@@ -35,18 +35,16 @@ namespace udp
 
     void UDPLib::udp_bind() const
     {
-        if (bind(sock, (const struct sockaddr *)&addr, sizeof(addr)) < 0)
+        if (bind(sock_, (const struct sockaddr *)&addr_, sizeof(addr_)) < 0)
         {
             std::cerr << "[Error] UDP bind error." << std::endl;
             exit(2);
         }
     }
 
-    void UDPLib::udp_receive(char *buffer) const
+    void UDPLib::udp_receive(void *msg) const
     {
-        // Initialize Buffer
-        memset(buffer, 0, BUFFER_SIZE);
-        if (recv(sock, buffer, sizeof(buffer), 0) < 0)
+        if (recv(sock_, msg, sizeof(msg), 0) < 0)
         {
             std::cerr << "[Error] UDP received data size is invalid." << std::endl;
             exit(2);

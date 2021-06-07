@@ -1,16 +1,17 @@
 #include <unistd.h>
 
 #include "udp_lib.hpp"
+#include "msg_A.hpp"
 
 int main()
 {
     udp::UDPLib server("0.0.0.0", 4001);
 
-    const std::string text = "hello";
+    const msg_A msg;
 
     while (1)
     {
-        server.udp_send(text.c_str(), sizeof(text.c_str()));
+        server.udp_send(&msg, sizeof(msg_A));
         usleep(1000000);
     }
 

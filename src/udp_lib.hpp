@@ -13,9 +13,8 @@ namespace udp
     class UDPLib
     {
     private:
-        int sock;
-        struct sockaddr_in addr;
-        static constexpr int BUFFER_SIZE = 1024;
+        int sock_;
+        struct sockaddr_in addr_;
 
     public:
         UDPLib(const std::string &address, const int port);
@@ -25,6 +24,6 @@ namespace udp
 
         void udp_bind() const;
 
-        void udp_receive(char *buffer) const;
+        void udp_receive(void *msg) const;
     };
 }
