@@ -7,11 +7,12 @@ int main()
 {
     udp::UDPLib server("0.0.0.0", 4001);
 
-    const msg_A msg;
+    msg_A msg;
+    const std::unique_ptr<msg_A> msg_ptr = std::make_unique<msg_A>(msg);
 
     while (1)
     {
-        server.udp_send(&msg, sizeof(msg_A));
+        server.udp_send(&msg_ptr);
         usleep(1000000);
     }
 
