@@ -9,12 +9,15 @@ int main()
     client.udp_bind();
 
     msg_A msg;
-    const std::unique_ptr<msg_A> msg_ptr = std::make_unique<msg_A>(msg);
+    char txt[100];
 
     while (1)
     {
-        client.udp_receive(&msg_ptr);
+        client.udp_receive(&msg);
+        // client.udp_receive(&txt);
+
         std::cout << msg.type << std::endl;
+        // std::cout << txt << std::endl;
     }
     return 0;
 }
