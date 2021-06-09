@@ -14,5 +14,22 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
-add_subdirectory(src)
-add_subdirectory(test)
+
+add_executable(server server.cpp)
+add_executable(client client.cpp)
+
+# target_compile_options(udp_lib PUBLIC -O3 -Wall -march=native)
+target_compile_options(server PUBLIC -g -Wall)
+target_include_directories(
+    server
+    PUBLIC
+    include
+)
+
+# target_compile_options(udp_lib PUBLIC -O3 -Wall -march=native)
+target_compile_options(client PUBLIC -g -Wall)
+target_include_directories(
+    client
+    PUBLIC
+    include
+)

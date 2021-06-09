@@ -63,5 +63,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp"
-    }
+    },
+    "python.analysis.extraPaths": [
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ]
 }

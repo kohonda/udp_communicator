@@ -50,12 +50,9 @@ namespace udp
         }
 
         template <typename MSG>
-        void udp_send(const MSG *msg) const
+        void udp_send(const MSG &msg) const
         {
-            char *send_data = nullptr;
-            send_data = (char *)msg;
-            // if (sendto(sock_, (char *)msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
-            if (sendto(sock_, send_data, sizeof(send_data), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+            if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
             {
                 std::cerr << "[Error] UDP send Error." << std::endl;
                 exit(1);
@@ -65,17 +62,12 @@ namespace udp
         template <typename MSG>
         void udp_receive(MSG *msg) const
         {
-            char *received_data;
-            memset(received_data, 0, sizeof(msg));
             socklen_t len = sizeof(addr_);
-            // if (recvfrom(sock_, (char *)msg, sizeof(msg), 0, (struct sockaddr *)&addr_, &len) < 0)
-            if (recvfrom(sock_, received_data, sizeof(received_data), 0, (struct sockaddr *)&addr_, &len) < 0)
+            if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
             {
                 std::cerr << "[Error] UDP received data size is invalid." << std::endl;
                 exit(2);
             }
-            // TODO : Need convert byte to MSG
-            msg = (MSG *)received_data;
         }
     };
 }
