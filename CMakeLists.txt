@@ -15,21 +15,21 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
 
-add_executable(server server.cpp)
-add_executable(client client.cpp)
+add_executable(send send.cpp)
+add_executable(receive receive.cpp)
 
-target_compile_options(server PUBLIC -O3 -Wall -march=native)
-# target_compile_options(server PUBLIC -g -Wall)
+target_compile_options(send PUBLIC -O3 -Wall)
+# target_compile_options(send PUBLIC -g -Wall)
 target_include_directories(
-    server
+    send
     PUBLIC
     include
 )
 
-target_compile_options(client PUBLIC -O3 -Wall -march=native)
-# target_compile_options(client PUBLIC -g -Wall)
+target_compile_options(receive PUBLIC -O3 -Wall)
+# target_compile_options(receive PUBLIC -g -Wall)
 target_include_directories(
-    client
+    receive
     PUBLIC
     include
 )
