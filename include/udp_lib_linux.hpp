@@ -12,11 +12,15 @@
 
 namespace udp
 {
+
     class UDPLib
     {
     private:
         int sock_;
         struct sockaddr_in addr_;
+
+        std::string addres_;
+        int port_;
 
     public:
         UDPLib(const std::string &address, const int port)
@@ -38,11 +42,9 @@ namespace udp
             // Non blocking setting
             const auto val = 1; // 0: blocking, 1: non-blocking
             ioctl(sock_, FIONBIO, &val);
-        }
 
-        ~UDPLib()
-        {
-            close(sock_);
+            addres_ = address;
+            port_ = port;
         }
 
         void udp_bind() const
@@ -65,15 +67,17 @@ namespace udp
         }
 
         template <typename MSG>
-        bool udp_receive(MSG *msg) const
+        bool udp_receive(MSG *msg)
         {
             socklen_t len = sizeof(addr_);
             if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
             {
+
                 return false; // not receive data yet
             }
             else
             {
+
                 return true; // receive data
             }
         }
