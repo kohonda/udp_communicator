@@ -2,6 +2,7 @@
 
 Linux/Windows対応
 header only udp通信ライブラリとサンプルコード
+受け取った最新のメッセージのみ読み続ける
 
 ## How to use
 1. `include`フォルダに入っている

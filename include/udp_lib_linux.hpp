@@ -69,16 +69,30 @@ namespace udp
         template <typename MSG>
         bool udp_receive(MSG *msg)
         {
-            socklen_t len = sizeof(addr_);
-            if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
+            bool is_receive_msg = false;
+            bool is_the_end_of_queue = false;
+            while (!is_the_end_of_queue)
             {
+                socklen_t len = sizeof(addr_);
+                if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
+                {
+                    is_the_end_of_queue = true;
+                }
+                else
+                {
+                    // Keep reading the socket queue until the end.
+                    is_the_end_of_queue = false;
+                    is_receive_msg = true;
+                }
+            }
 
-                return false; // not receive data yet
+            if (is_receive_msg)
+            {
+                return true;
             }
             else
             {
-
-                return true; // receive data
+                return false;
             }
         }
     };

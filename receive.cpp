@@ -23,12 +23,10 @@ int main()
 			std::cout << "Receive_type: " << msg.type << std::endl;
 			std::cout << "Receive_x: " << msg.x << std::endl;
 		}
-		// else
-		// {
-		// 	std::cout << "Receive_time : " << msg.time << std::endl;
-		// 	std::cout << "Receive_type: " << msg.type << std::endl;
-		// 	std::cout << "Receive_x: " << msg.x << std::endl;
-		// }
+		else
+		{
+			std::cout << "Not receive new msg yet." << std::endl;
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 	}
