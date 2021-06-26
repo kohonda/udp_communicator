@@ -13,7 +13,9 @@ int main()
 
 	msg_A msg;
 
-	constexpr int sleep_time = 2000; // [msec]
+	const int sleep_time = 2000; // [msec]
+
+	std::cout << "Receive every " << sleep_time / 1000.0 << " seconds" << std::endl;
 
 	while (1)
 	{

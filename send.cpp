@@ -10,12 +10,14 @@ int main()
 
 	msg_A msg;
 
-	constexpr int sleep_time = 1000; // [msec]
+	const int sleep_time = 1000; // [msec]
 
 	msg.x = 0;
 	msg.y = 30;
 	msg.z = 40;
 	msg.type = 3;
+
+	std::cout << "Send every " << sleep_time / 1000.0 << " seconds" << std::endl;
 
 	while (1)
 	{
