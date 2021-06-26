@@ -6,7 +6,7 @@
 
 int main()
 {
-	udp::UDPLib server("127.0.0.1", 5555);
+	udp::UDPLib<msg_A> server("127.0.0.1", 5555);
 
 	msg_A msg;
 
@@ -28,8 +28,6 @@ int main()
 		std::cout << "Send_time : " << msg.time << std::endl;
 		std::cout << "Send_type : " << msg.type << std::endl;
 		std::cout << "Send_x : " << msg.x << std::endl;
-
-		msg.x += 1;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 	}

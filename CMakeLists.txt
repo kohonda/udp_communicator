@@ -17,8 +17,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
 add_executable(send send.cpp)
 add_executable(receive receive.cpp)
-# add_executable(node_1 node_1.cpp)
-# add_executable(node_2 node_2.cpp)
+
 
 target_compile_options(send PUBLIC -O3 -Wall)
 # target_compile_options(send PUBLIC -g -Wall)
@@ -36,19 +35,5 @@ target_include_directories(
     include
 )
 
-# target_compile_options(node_1 PUBLIC -O3 -Wall)
-# # target_compile_options(node_1 PUBLIC -g -Wall)
-# target_include_directories(
-#     node_1
-#     PUBLIC
-#     include
-# )
 
-# target_compile_options(node_2 PUBLIC -O3 -Wall)
-# # target_compile_options(node_2 PUBLIC -g -Wall)
-# target_include_directories(
-#     node_2
-#     PUBLIC
-#     include
-# )
 

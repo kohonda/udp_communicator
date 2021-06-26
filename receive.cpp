@@ -7,7 +7,7 @@
 int main()
 {
 
-	udp::UDPLib client("127.0.0.1", 5555);
+	udp::UDPLib<msg_A> client("127.0.0.1", 5555);
 
 	client.udp_bind();
 

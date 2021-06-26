@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UDP_LIB_LINUX
+#define UDP_LIB_LINUX
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -6,21 +7,16 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <string.h>
-#include <iostream>
-#include <memory>
 
 namespace udp
 {
 
+    template <typename MSG_TYPE>
     class UDPLib
     {
     private:
         int sock_;
         struct sockaddr_in addr_;
-
-        std::string addres_;
-        int port_;
 
     public:
         UDPLib(const std::string &address, const int port)
@@ -42,9 +38,6 @@ namespace udp
             // Non blocking setting
             const auto val = 1; // 0: blocking, 1: non-blocking
             ioctl(sock_, FIONBIO, &val);
-
-            addres_ = address;
-            port_ = port;
         }
 
         void udp_bind() const
@@ -56,8 +49,7 @@ namespace udp
             }
         }
 
-        template <typename MSG>
-        void udp_send(const MSG &msg) const
+        void udp_send(const MSG_TYPE &msg) const
         {
             if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
             {
@@ -66,8 +58,7 @@ namespace udp
             }
         }
 
-        template <typename MSG>
-        bool udp_receive(MSG *msg)
+        bool udp_receive(MSG_TYPE *msg) const
         {
             bool is_receive_msg = false;
             bool is_the_end_of_queue = false;
@@ -97,3 +88,5 @@ namespace udp
         }
     };
 }
+
+#endif

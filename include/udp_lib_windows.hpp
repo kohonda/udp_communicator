@@ -1,3 +1,7 @@
+
+#ifndef UDP_LIB_WIN
+#define UDP_LIB_WIN
+
 #include <winsock2.h>
 #include <stdio.h>
 #include <ws2tcpip.h>
@@ -10,6 +14,7 @@
 
 namespace udp
 {
+    template <typename MSG_TYPE>
     class UDPLib
     {
     private:
@@ -37,6 +42,10 @@ namespace udp
             server_addr_.sin_port = htons(port);
             server_addr_.sin_addr.S_un.S_addr = INADDR_ANY;
             InetPton(AF_INET, address.c_str(), &server_addr_.sin_addr.s_addr);
+
+            // Non blocking setting
+            const auto val = 1; // 0: blocking, 1: non-blocking
+            ioctl(sock_, FIONBIO, &val);
         }
 
         ~UDPLib()
@@ -54,8 +63,7 @@ namespace udp
             }
         }
 
-        template <typename MSG>
-        void udp_send(const MSG &msg) const
+        void udp_send(const MSG_TYPE &msg) const
         {
             if (sendto(sock_, (char *)&msg, sizeof(msg), 0, (struct sockaddr *)&server_addr_, sizeof(server_addr_)) < 0)
             {
@@ -64,15 +72,35 @@ namespace udp
             }
         }
 
-        template <typename MSG>
-        void udp_receive(MSG *msg) const
+        bool udp_receive(MSG_TYPE *msg) const
         {
-            socklen_t len = sizeof(client_addr_);
-            if (recvfrom(sock_, (char *)msg, sizeof(*msg), 0, (struct sockaddr *)&client_addr_, &len) < 0)
+            bool is_receive_msg = false;
+            bool is_the_end_of_queue = false;
+            while (!is_the_end_of_queue)
             {
-                std::cerr << "[Error] UDP received data size is invalid." << std::endl;
-                exit(2);
+                socklen_t len = sizeof(client_addr_);
+                if (recvfrom(sock_, (char *)msg, sizeof(*msg), 0, (struct sockaddr *)&client_addr_, &len) < 0)
+                {
+                    is_the_end_of_queue = true;
+                }
+                else
+                {
+                    // Keep reading the socket queue until the end.
+                    is_the_end_of_queue = false;
+                    is_receive_msg = true;
+                }
+            }
+
+            if (is_receive_msg)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     };
 }
+
+#endif
