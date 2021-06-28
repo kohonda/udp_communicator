@@ -44,8 +44,8 @@ namespace udp
             InetPton(AF_INET, address.c_str(), &server_addr_.sin_addr.s_addr);
 
             // Non blocking setting
-            const auto val = 1; // 0: blocking, 1: non-blocking
-            ioctl(sock_, FIONBIO, &val);
+            u_long val = 1; // 0: blocking, 1: non-blocking
+            ioctlsocket(sock_, FIONBIO, &val);
         }
 
         ~UDPLib()

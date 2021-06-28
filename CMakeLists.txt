@@ -20,7 +20,6 @@ add_executable(receive receive.cpp)
 
 
 target_compile_options(send PUBLIC -O3 -Wall)
-# target_compile_options(send PUBLIC -g -Wall)
 target_include_directories(
     send
     PUBLIC
@@ -28,7 +27,6 @@ target_include_directories(
 )
 
 target_compile_options(receive PUBLIC -O3 -Wall)
-# target_compile_options(receive PUBLIC -g -Wall)
 target_include_directories(
     receive
     PUBLIC
