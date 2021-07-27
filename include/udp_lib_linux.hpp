@@ -7,6 +7,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <thread>
+#include <chrono>
 
 namespace udp
 {
@@ -45,7 +47,10 @@ namespace udp
             if (bind(sock_, (const struct sockaddr *)&addr_, sizeof(addr_)) < 0)
             {
                 std::cerr << "[Error] UDP bind error." << std::endl;
-                exit(2);
+                const int sleep_time = 1; // [msec]
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+
+                // exit(2);
             }
         }
 

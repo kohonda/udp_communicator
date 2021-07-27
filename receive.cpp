@@ -3,15 +3,16 @@
 #include <thread>
 #include "udp_lib_switcher.hpp"
 #include "msg_A.hpp"
+#include "observed_msg.hpp"
 
 int main()
 {
 
-	udp::UDPLib<msg_A> client("127.0.0.1", 5555);
+	udp::UDPLib<ObservedMsg> client("192.168.140.101", 60000);
 
 	client.udp_bind();
 
-	msg_A msg;
+	ObservedMsg msg;
 
 	const int sleep_time = 2000; // [msec]
 
@@ -21,9 +22,9 @@ int main()
 	{
 		if (client.udp_receive(&msg))
 		{
-			std::cout << "Receive_time : " << msg.time << std::endl;
-			std::cout << "Receive_type: " << msg.type << std::endl;
-			std::cout << "Receive_x: " << msg.x << std::endl;
+			std::cout << "Receive_time : " << msg.time_counter << std::endl;
+			// std::cout << "Receive_type: " << msg.type << std::endl;
+			// std::cout << "Receive_x: " << msg.x << std::endl;
 		}
 		else
 		{
