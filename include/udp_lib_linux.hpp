@@ -13,14 +13,13 @@
 
 namespace udp
 {
-
     template <typename MSG_TYPE>
     class UDPLib
     {
     private:
         int sock_;
         struct sockaddr_in addr_;
-        const size_t max_msg_byte_size_ = 512;
+        const long int max_msg_byte_size_ = 512;
 
     public:
         /**
@@ -130,10 +129,15 @@ namespace udp
             {
                 socklen_t len = sizeof(addr_);
                 memset(buf, 0, sizeof(buf));
-                const auto size = recvfrom(sock_, buf, sizeof(buf), 0, (struct sockaddr *)&addr_, &len);
-                if (size < 0)
+                const auto msg_size = recvfrom(sock_, buf, sizeof(buf), 0, (struct sockaddr *)&addr_, &len);
+                if (msg_size < 0)
                 {
                     is_the_end_of_queue = true;
+                }
+                else if (msg_size >= max_msg_byte_size_)
+                {
+                    std::cerr << "[Error] Please set a larger max_msg_byte_size_." << std::endl;
+                    exit(3);
                 }
                 else
                 {
