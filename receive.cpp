@@ -7,7 +7,7 @@
 int main()
 {
 
-	udp::UDPLib<msg_A> client("127.0.0.1", 60000);
+	udp::UDPLib<std::stringstream> client("127.0.0.1", 60000);
 
 	client.udp_bind();
 
@@ -19,10 +19,16 @@ int main()
 
 	while (1)
 	{
-		if (client.udp_receive(&msg))
+		std::string str;
+
+		if (client.udp_receive(str))
 		{
+			std::stringstream ss;
+			ss << str;
+			cereal::JSONInputArchive i_archive(ss);
+			i_archive(msg);
 			std::cout << "time : " << msg.time << std::endl;
-			std::cout << "Receive_x : " << msg.x << std::endl;
+			std::cout << "x : " << msg.x << std::endl;
 		}
 		else
 		{

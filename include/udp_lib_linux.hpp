@@ -7,8 +7,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <thread>
-#include <chrono>
+#include <iostream>
+#include <cstring>
 
 namespace udp
 {
@@ -100,29 +100,73 @@ namespace udp
             }
         }
 
-        void udp_send(const MSG_TYPE &msg) const
+        // void udp_send(const MSG_TYPE &msg) const
+        // {
+        //     if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+        //     {
+        //         std::cerr << "[Error] UDP send Error." << std::endl;
+        //         exit(1);
+        //     }
+        // }
+
+        void udp_send(const std::string &msg) const
         {
-            if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+            if (sendto(sock_, msg.c_str(), msg.length(), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
             {
                 std::cerr << "[Error] UDP send Error." << std::endl;
                 exit(1);
             }
         }
 
-        bool udp_receive(MSG_TYPE *msg) const
+        //     bool udp_receive(MSG_TYPE *msg) const
+        //     {
+        //         bool is_receive_msg = false;
+        //         bool is_the_end_of_queue = false;
+        //         while (!is_the_end_of_queue)
+        //         {
+        //             socklen_t len = sizeof(addr_);
+        //             if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
+        //             {
+        //                 is_the_end_of_queue = true;
+        //             }
+        //             else
+        //             {
+        //                 // Keep reading the socket queue until the end.
+        //                 is_the_end_of_queue = false;
+        //                 is_receive_msg = true;
+        //             }
+        //         }
+
+        //         if (is_receive_msg)
+        //         {
+        //             return true;
+        //         }
+        //         else
+        //         {
+        //             return false;
+        //         }
+        //     }
+        // };
+
+        bool udp_receive(std::string &msg) const
         {
             bool is_receive_msg = false;
             bool is_the_end_of_queue = false;
+            // char buf[sizeof(msg)];
+            char buf[400];
+
             while (!is_the_end_of_queue)
             {
                 socklen_t len = sizeof(addr_);
-                if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
+                memset(buf, 0, sizeof(buf));
+                if (recvfrom(sock_, buf, sizeof(buf), 0, (struct sockaddr *)&addr_, &len) < 0)
                 {
                     is_the_end_of_queue = true;
                 }
                 else
                 {
                     // Keep reading the socket queue until the end.
+                    msg = std::string(buf);
                     is_the_end_of_queue = false;
                     is_receive_msg = true;
                 }
