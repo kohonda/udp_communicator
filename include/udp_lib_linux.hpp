@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <cereal/archives/json.hpp>
 
 namespace udp
 {
@@ -19,6 +20,7 @@ namespace udp
     private:
         int sock_;
         struct sockaddr_in addr_;
+        const size_t max_msg_byte_size_ = 512;
 
     public:
         /**
@@ -100,80 +102,54 @@ namespace udp
             }
         }
 
-        // void udp_send(const MSG_TYPE &msg) const
-        // {
-        //     if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
-        //     {
-        //         std::cerr << "[Error] UDP send Error." << std::endl;
-        //         exit(1);
-        //     }
-        // }
-
-        void udp_send(const std::string &msg) const
+        void udp_send(const MSG_TYPE &msg) const
         {
-            if (sendto(sock_, msg.c_str(), msg.length(), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+            // Serialization
+            std::stringstream ss;
+            {
+                cereal::JSONOutputArchive o_archive(ss);
+                o_archive(msg);
+            }
+
+            // Send
+            if (sendto(sock_, ss.str().c_str(), ss.str().length(), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
             {
                 std::cerr << "[Error] UDP send Error." << std::endl;
                 exit(1);
             }
         }
 
-        //     bool udp_receive(MSG_TYPE *msg) const
-        //     {
-        //         bool is_receive_msg = false;
-        //         bool is_the_end_of_queue = false;
-        //         while (!is_the_end_of_queue)
-        //         {
-        //             socklen_t len = sizeof(addr_);
-        //             if (recvfrom(sock_, msg, sizeof(*msg), 0, (struct sockaddr *)&addr_, &len) < 0)
-        //             {
-        //                 is_the_end_of_queue = true;
-        //             }
-        //             else
-        //             {
-        //                 // Keep reading the socket queue until the end.
-        //                 is_the_end_of_queue = false;
-        //                 is_receive_msg = true;
-        //             }
-        //         }
-
-        //         if (is_receive_msg)
-        //         {
-        //             return true;
-        //         }
-        //         else
-        //         {
-        //             return false;
-        //         }
-        //     }
-        // };
-
-        bool udp_receive(std::string &msg) const
+        bool udp_receive(MSG_TYPE *msg) const
         {
             bool is_receive_msg = false;
             bool is_the_end_of_queue = false;
-            // char buf[sizeof(msg)];
-            char buf[400];
+            char buf[max_msg_byte_size_];
+            std::string tmp_msg;
 
             while (!is_the_end_of_queue)
             {
                 socklen_t len = sizeof(addr_);
                 memset(buf, 0, sizeof(buf));
-                if (recvfrom(sock_, buf, sizeof(buf), 0, (struct sockaddr *)&addr_, &len) < 0)
+                const auto size = recvfrom(sock_, buf, sizeof(buf), 0, (struct sockaddr *)&addr_, &len);
+                if (size < 0)
                 {
                     is_the_end_of_queue = true;
                 }
                 else
                 {
                     // Keep reading the socket queue until the end.
-                    msg = std::string(buf);
                     is_the_end_of_queue = false;
                     is_receive_msg = true;
+                    tmp_msg = std::string(buf);
                 }
             }
 
             if (is_receive_msg)
             {
+                std::stringstream ss;
+                ss << tmp_msg;
+                cereal::JSONInputArchive in_archive(ss);
+                in_archive(*msg);
                 return true;
             }
             else

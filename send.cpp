@@ -6,7 +6,7 @@
 
 int main()
 {
-	udp::UDPLib<std::stringstream> server("127.0.0.1", 60000);
+	udp::UDPLib<msg_A> server("127.0.0.1", 60000);
 
 	msg_A msg;
 
@@ -23,16 +23,16 @@ int main()
 
 		msg.x += 1.0;
 
-		std::stringstream ss;
-		{
-			cereal::JSONOutputArchive o_archive(ss);
-			o_archive(msg);
-		}
+		// std::stringstream ss;
+		// {
+		// 	cereal::JSONOutputArchive o_archive(ss);
+		// 	o_archive(msg);
+		// }
 
-		server.udp_send(ss.str());
+		server.udp_send(msg);
 
 		std::cout << "send :" << std::endl;
-		std::cout << ss.str() << std::endl;
+		std::cout << msg.time << std::endl;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 	}

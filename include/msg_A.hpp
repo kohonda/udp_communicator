@@ -2,7 +2,6 @@
 #include <string>
 
 #include <cereal/cereal.hpp>
-#include <cereal/archives/json.hpp>
 
 struct msg_A
 {
