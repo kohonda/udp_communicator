@@ -91,6 +91,32 @@ namespace udp
             }
         }
 
+        /**
+         * @brief Construct a new UDPLib object, can receive from ip-address 
+         * 
+         * @param port 
+         */
+        UDPLib(const int port)
+        {
+            // Generate socket
+            // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
+            sock_ = socket(AF_INET, SOCK_DGRAM, 0);
+            if (sock_ < 0)
+            {
+                std::cerr << "[Error] Socket initialize error." << std::endl;
+                exit(0);
+            }
+
+            // IP/port setting
+            addr_.sin_family = AF_INET;
+            addr_.sin_addr.s_addr = INADDR_ANY;
+            addr_.sin_port = htons(port);
+
+            // Non blocking setting
+            const auto val = 1; // 0: blocking, 1: non-blocking
+            ioctl(sock_, FIONBIO, &val);
+        }
+
         void udp_bind() const
         {
             if (bind(sock_, (const struct sockaddr *)&addr_, sizeof(addr_)) < 0)
