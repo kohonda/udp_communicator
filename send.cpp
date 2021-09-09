@@ -6,7 +6,7 @@
 
 int main()
 {
-	udp::UDPLib<msg_A> publisher("127.0.0.1", 60000);
+	udp_lib::Sender<msg_A> sender("127.0.0.1", 60000);
 
 	msg_A msg;
 
@@ -21,7 +21,7 @@ int main()
 		msg.vec.resize(5);
 		msg.type = "test";
 
-		publisher.udp_send(msg);
+		sender.udp_send(msg);
 
 		std::cout << "send :" << std::endl;
 		std::cout << "time :" << msg.time << std::endl;

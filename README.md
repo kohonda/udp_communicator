@@ -8,35 +8,55 @@ Get only latest message when received.
 
 #### Message definition
 ```c++
-#include <ctime>
-
 struct msg_A
 {
     std::time_t time;
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
-    int type = 0;
+    std::string type;
+    std::vector<double> vec;
+
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(time, type, vec);
+    }
 };
 ```
 
 #### Sender example
 
 ```c++
+#include <thread>
+#include <chrono>
+#include <iostream>
 #include "udp_lib_switcher.hpp"
 #include "msg_A.hpp"
 
 int main()
 {
-	udp::UDPLib<msg_A> server("127.0.0.1", 5555);
+	udp_lib::Sender<msg_A> sender("127.0.0.1", 60000);
+
 	msg_A msg;
 
-	msg.x = 0;
-	msg.y = 30;
-	msg.z = 40;
-	msg.type = 3;
+	const int sleep_time = 1000; // [msec]
 
-	server.udp_send(msg);
+	std::cout << "Send every " << sleep_time / 1000.0 << " seconds" << std::endl;
+
+	while (1)
+	{
+		std::chrono::system_clock::time_point p = std::chrono::system_clock::now();
+		msg.time = std::chrono::system_clock::to_time_t(p);
+		msg.vec.resize(5);
+		msg.type = "test";
+
+		sender.udp_send(msg);
+
+		std::cout << "send :" << std::endl;
+		std::cout << "time :" << msg.time << std::endl;
+		std::cout << "type : " << msg.type << std::endl;
+		std::cout << "vec size : " << msg.vec.size() << std::endl;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+	}
 
 	return 0;
 }
@@ -45,26 +65,39 @@ int main()
 #### Receiver exapmple
 
 ```c++
+#include <iostream>
+#include <chrono>
+#include <thread>
 #include "udp_lib_switcher.hpp"
 #include "msg_A.hpp"
 
 int main()
 {
-	udp::UDPLib<msg_A> client("127.0.0.1", 5555);
-	client.udp_bind();
+
+	udp_lib::Receiver<msg_A> receiver("127.0.0.1", 60000);
+
 	msg_A msg;
 
-	if (client.udp_receive(&msg))
-	{
-		std::cout << "Receive_time : " << msg.time << std::endl;
-		std::cout << "Receive_type: " << msg.type << std::endl;
-		std::cout << "Receive_x: " << msg.x << std::endl;
-	}
-	else
-	{
-		std::cout << "Not receive new msg yet." << std::endl;
-	}
+	const int sleep_time = 2000; // [msec]
 
+	std::cout << "Receive every " << sleep_time / 1000.0 << " seconds" << std::endl;
+
+	while (1)
+	{
+
+		if (receiver.udp_receive(&msg))
+		{
+			std::cout << "time : " << msg.time << std::endl;
+			std::cout << "type : " << msg.type << std::endl;
+			std::cout << "vec_size : " << msg.vec.size() << std::endl;
+		}
+		else
+		{
+			std::cout << "Not receive new msg yet." << std::endl;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+	}
 	return 0;
 }
 ```
@@ -111,3 +144,10 @@ On another terminal
 ```
 
 ![example](img/example.png)
+
+## TODO
+- PC間通信テスト
+- cereal,archive関数隠蔽
+- 通信プロトコル切り替え
+- windows対応
+- 通信速度を上げたときの挙動

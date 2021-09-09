@@ -7,9 +7,7 @@
 int main()
 {
 
-	udp::UDPLib<msg_A> subscriber("127.0.0.1", 60000);
-
-	subscriber.udp_bind();
+	udp_lib::Receiver<msg_A> receiver("127.0.0.1", 60000);
 
 	msg_A msg;
 
@@ -20,7 +18,7 @@ int main()
 	while (1)
 	{
 
-		if (subscriber.udp_receive(&msg))
+		if (receiver.udp_receive(&msg))
 		{
 			std::cout << "time : " << msg.time << std::endl;
 			std::cout << "type : " << msg.type << std::endl;
