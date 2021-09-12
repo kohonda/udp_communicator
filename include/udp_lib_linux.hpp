@@ -10,10 +10,20 @@
 #include <iostream>
 #include <cstring>
 #include <cereal/archives/json.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/portable_binary.hpp>
 
 namespace udp_lib
 {
-    template <typename MSG_TYPE>
+    enum class SERIAL_TYPE
+    {
+        JSON,
+        XML,
+        BINARY,
+    };
+
+    template <typename MSG_TYPE, SERIAL_TYPE _SERIAL_TYPE_>
     class Sender
     {
     private:
@@ -100,8 +110,26 @@ namespace udp_lib
             // Serialization
             std::stringstream ss;
             {
-                cereal::JSONOutputArchive o_archive(ss);
-                o_archive(msg);
+                if constexpr (_SERIAL_TYPE_ == SERIAL_TYPE::JSON)
+                {
+                    cereal::JSONOutputArchive out_archive(ss);
+                    out_archive(msg);
+                }
+                else if constexpr (_SERIAL_TYPE_ == SERIAL_TYPE::XML)
+                {
+                    cereal::XMLOutputArchive out_archive(ss);
+                    out_archive(msg);
+                }
+                else if constexpr (_SERIAL_TYPE_ == SERIAL_TYPE::BINARY)
+                {
+                    cereal::BinaryOutputArchive out_archive(ss);
+                    out_archive(msg);
+                }
+                else
+                {
+                    std::cerr << "[Error] Please set correct type of serialization" << std::endl;
+                    exit(0);
+                }
             }
 
             // Send
@@ -113,7 +141,7 @@ namespace udp_lib
         }
     };
 
-    template <typename MSG_TYPE>
+    template <typename MSG_TYPE, SERIAL_TYPE _SERIAL_TYPE_>
     class Receiver
     {
     private:
@@ -234,8 +262,27 @@ namespace udp_lib
             {
                 std::stringstream ss;
                 ss << tmp_msg;
-                cereal::JSONInputArchive in_archive(ss);
-                in_archive(*msg);
+                if constexpr (_SERIAL_TYPE_ == SERIAL_TYPE::JSON)
+                {
+                    cereal::JSONInputArchive in_archive(ss);
+                    in_archive(*msg);
+                }
+                else if constexpr (_SERIAL_TYPE_ == SERIAL_TYPE::XML)
+                {
+                    cereal::XMLInputArchive in_archive(ss);
+                    in_archive(*msg);
+                }
+                else if constexpr (_SERIAL_TYPE_ == SERIAL_TYPE::BINARY)
+                {
+                    cereal::BinaryInputArchive in_archive(ss);
+                    in_archive(*msg);
+                }
+                else
+                {
+                    std::cerr << "[Error] Please set correct type of deserialization" << std::endl;
+                    exit(2);
+                }
+
                 return true;
             }
             else

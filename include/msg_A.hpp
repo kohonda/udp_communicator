@@ -13,6 +13,6 @@ struct msg_A
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(time, type, vec);
+        archive(CEREAL_NVP(time), CEREAL_NVP(type), CEREAL_NVP(vec));
     }
 };

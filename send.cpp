@@ -3,10 +3,11 @@
 #include <iostream>
 #include "udp_lib_switcher.hpp"
 #include "msg_A.hpp"
+// #include "msg_B.hpp"
 
 int main()
 {
-	udp_lib::Sender<msg_A> sender("127.0.0.1", 60000);
+	udp_lib::Sender<msg_A, udp_lib::SERIAL_TYPE::BINARY> sender("127.0.0.1", 60000);
 
 	msg_A msg;
 

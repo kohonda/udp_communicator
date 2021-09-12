@@ -7,7 +7,7 @@
 int main()
 {
 
-	udp_lib::Receiver<msg_A> receiver("127.0.0.1", 60000);
+	udp_lib::Receiver<msg_A, udp_lib::SERIAL_TYPE::BINARY> receiver("127.0.0.1", 60000);
 
 	msg_A msg;
 
