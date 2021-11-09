@@ -7,14 +7,13 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <thread>
-#include <chrono>
+#include <iostream>
+#include <cstring>
 
-namespace udp
+namespace udp_lib
 {
 
-    template <typename MSG_TYPE>
-    class UDPLib
+    class Sender
     {
     private:
         int sock_;
@@ -22,12 +21,12 @@ namespace udp
 
     public:
         /**
-    　　  * @brief Construct a new UDPLib object, normal usage
+    　　  * @brief Construct a Sender object, normal usage
     　　  * 
-    　　  * @param address: When publisher, Set destination IP address. When subscriber, Set source IP address.  
-    　　  * @param port: When publisher, Set destination port. When subscriber, Set source port.
+    　　  * @param destination_address: IP address of receiver
+    　　  * @param destination_port: Destination port
     　　  */
-        UDPLib(const std::string &address, const int port)
+        Sender(const std::string &destination_address, const int destination_port)
         {
             // Generate socket
             // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
@@ -40,8 +39,8 @@ namespace udp
 
             // IP/port setting
             addr_.sin_family = AF_INET;
-            addr_.sin_addr.s_addr = inet_addr(address.c_str());
-            addr_.sin_port = htons(port);
+            addr_.sin_addr.s_addr = inet_addr(destination_address.c_str());
+            addr_.sin_port = htons(destination_port);
 
             // Non blocking setting
             const auto val = 1; // 0: blocking, 1: non-blocking
@@ -49,13 +48,13 @@ namespace udp
         }
 
         /**
-         * @brief Construct a new UDPLib object, can set source port
+         * @brief Construct a new UDPLib object, Set source port
          * 
-         * @param destination_address: When publisher, Set destination IP address. When subscriber, Set source IP address.  
+         * @param destination_address: IP address of receiver
          * @param destination_port
          * @param source_port 
          */
-        UDPLib(const std::string &destination_address, const int destination_port, const int source_port)
+        Sender(const std::string &destination_address, const int destination_port, const int source_port)
         {
             // Generate socket
             // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
@@ -90,8 +89,59 @@ namespace udp
             }
         }
 
-        void udp_bind() const
+        /**
+         * @brief Send message by udp
+         * 
+         * @param [in] sending message 
+         */
+        template <typename MSG_TYPE>
+        void udp_send(const MSG_TYPE &msg) const
         {
+            // Send message
+            if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+            {
+                std::cerr << "[Error] UDP send error." << std::endl;
+                exit(3);
+            }
+        }
+    };
+
+    class Receiver
+    {
+    private:
+        int sock_;
+        struct sockaddr_in addr_;
+        const int max_msg_byte_size_; // Maximum message buffer size when receiving
+
+    public:
+        /**
+         * @brief Construct a new Receiver object, normal usage
+         * 
+         * @param source_address : IP address of the sender
+         * @param receive_port 
+         * @param max_msg_byte_size : Maximum message buffer size when receiving
+         */
+        Receiver(const std::string &source_address, const int receive_port, const int max_msg_byte_size = 512) : max_msg_byte_size_{max_msg_byte_size}
+        {
+            // Generate socket
+            // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
+            sock_ = socket(AF_INET, SOCK_DGRAM, 0);
+            if (sock_ < 0)
+            {
+                std::cerr << "[Error] Socket initialize error." << std::endl;
+                exit(0);
+            }
+
+            // IP/port setting
+            addr_.sin_family = AF_INET;
+            addr_.sin_addr.s_addr = inet_addr(source_address.c_str());
+            addr_.sin_port = htons(receive_port);
+
+            // Non blocking setting
+            const auto val = 1; // 0: blocking, 1: non-blocking
+            ioctl(sock_, FIONBIO, &val);
+
+            // bind receive port
             if (bind(sock_, (const struct sockaddr *)&addr_, sizeof(addr_)) < 0)
             {
                 std::cerr << "[Error] UDP bind error." << std::endl;
@@ -100,15 +150,49 @@ namespace udp
             }
         }
 
-        void udp_send(const MSG_TYPE &msg) const
+        /**
+         * @brief Construct a new UDPLib object, can receive from any ip-address 
+         * 
+         * @param receive_port 
+         * @param max_msg_byte_size : Maximum message buffer size when receiving
+         */
+        Receiver(const int receive_port, const int max_msg_byte_size = 512) : max_msg_byte_size_{max_msg_byte_size}
         {
-            if (sendto(sock_, &msg, sizeof(msg), 0, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+            // Generate socket
+            // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
+            sock_ = socket(AF_INET, SOCK_DGRAM, 0);
+            if (sock_ < 0)
             {
-                std::cerr << "[Error] UDP send Error." << std::endl;
-                exit(1);
+                std::cerr << "[Error] Socket initialize error." << std::endl;
+                exit(0);
+            }
+
+            // IP/port setting
+            addr_.sin_family = AF_INET;
+            addr_.sin_addr.s_addr = INADDR_ANY;
+            addr_.sin_port = htons(receive_port);
+
+            // Non blocking setting
+            const auto val = 1; // 0: blocking, 1: non-blocking
+            ioctl(sock_, FIONBIO, &val);
+
+            // bind receive port
+            if (bind(sock_, (const struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+            {
+                std::cerr << "[Error] UDP bind error." << std::endl;
+
+                exit(2);
             }
         }
 
+        /**
+         * @brief Receive message
+         * 
+         * @param [in] msg 
+         * @return true : Receive message
+         * @return false : Not receive message
+         */
+        template <typename MSG_TYPE>
         bool udp_receive(MSG_TYPE *msg) const
         {
             bool is_receive_msg = false;

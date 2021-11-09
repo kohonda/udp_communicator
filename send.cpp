@@ -6,7 +6,7 @@
 
 int main()
 {
-	udp::UDPLib<msg_A> server("127.0.0.1", 60000);
+	udp_lib::Sender server("127.0.0.1", 60000);
 
 	msg_A msg;
 
