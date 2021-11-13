@@ -90,6 +90,14 @@ namespace udp
             }
         }
 
+		~UDPLib()
+		{
+			int result = close(sock_);
+			if (result == -1) {
+				std::cerr << "[Error] Failed to close socket." << std::endl;
+			}
+		}
+
         void udp_bind() const
         {
             if (bind(sock_, (const struct sockaddr *)&addr_, sizeof(addr_)) < 0)
