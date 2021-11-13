@@ -89,6 +89,14 @@ namespace udp_lib
             }
         }
 
+        ~Sender()
+        {
+            if (close(sock_) == -1)
+            {
+                std::cerr << "[Error] Socket close error." << std::endl;
+            }
+        }
+
         /**
          * @brief Send message by udp
          * 
@@ -182,6 +190,14 @@ namespace udp_lib
                 std::cerr << "[Error] UDP bind error." << std::endl;
 
                 exit(2);
+            }
+        }
+
+        ~Receiver()
+        {
+            if (close(sock_) == -1)
+            {
+                std::cerr << "[Error] Socket close error." << std::endl;
             }
         }
 
