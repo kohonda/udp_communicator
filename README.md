@@ -4,6 +4,8 @@ A header only C++ non-blocking UDP socket library for Windows/Linux.
 
 Get only latest message when received.
 
+** Message serialization has not been implemented yet, so limited message types are only available.
+
 ## Example
 
 #### Message definition
@@ -28,7 +30,7 @@ struct msg_A
 
 int main()
 {
-	udp::UDPLib<msg_A> server("127.0.0.1", 5555);
+	udp_lib::Sender sender("127.0.0.1", 60000);
 	msg_A msg;
 
 	msg.x = 0;
@@ -36,7 +38,7 @@ int main()
 	msg.z = 40;
 	msg.type = 3;
 
-	server.udp_send(msg);
+	sender.udp_send(msg);
 
 	return 0;
 }
@@ -50,11 +52,11 @@ int main()
 
 int main()
 {
-	udp::UDPLib<msg_A> client("127.0.0.1", 5555);
-	client.udp_bind();
+	udp_lib::Receiver receiver("127.0.0.1", 60000);
+
 	msg_A msg;
 
-	if (client.udp_receive(&msg))
+	if (receiver.udp_receive(&msg))
 	{
 		std::cout << "Receive_time : " << msg.time << std::endl;
 		std::cout << "Receive_type: " << msg.type << std::endl;

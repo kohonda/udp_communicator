@@ -7,9 +7,7 @@
 int main()
 {
 
-	udp_lib::Receiver client("127.0.0.1", 60000);
-
-	msg_A msg;
+	udp_lib::Receiver receiver("127.0.0.1", 60000);
 
 	const int sleep_time = 2000; // [msec]
 
@@ -17,7 +15,9 @@ int main()
 
 	while (1)
 	{
-		if (client.udp_receive(&msg))
+		msg_A msg;
+
+		if (receiver.udp_receive(&msg))
 		{
 			std::cout << "time : " << msg.time << std::endl;
 			std::cout << "Receive_x : " << msg.x << std::endl;

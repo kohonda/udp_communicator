@@ -6,13 +6,11 @@
 
 int main()
 {
-	udp_lib::Sender server("127.0.0.1", 60000);
+	udp_lib::Sender sender("127.0.0.1", 60000);
 
 	msg_A msg;
 
 	const int sleep_time = 100; // [msec]
-
-	msg.x = 0;
 
 	std::cout << "Send every " << sleep_time / 1000.0 << " seconds" << std::endl;
 
@@ -23,7 +21,7 @@ int main()
 
 		msg.x += 1.0;
 
-		server.udp_send(msg);
+		sender.udp_send(msg);
 
 		std::cout << "time : " << msg.time << std::endl;
 		std::cout << "Send_x : " << msg.x << std::endl;
