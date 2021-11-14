@@ -119,7 +119,6 @@ namespace udp_lib
     private:
         int sock_;
         struct sockaddr_in addr_;
-        const int max_msg_byte_size_; // Maximum message buffer size when receiving
 
     public:
         /**
@@ -127,9 +126,8 @@ namespace udp_lib
          * 
          * @param source_address : IP address of the sender
          * @param receive_port 
-         * @param max_msg_byte_size : Maximum message buffer size when receiving
          */
-        Receiver(const std::string &source_address, const int receive_port, const int max_msg_byte_size = 512) : max_msg_byte_size_{max_msg_byte_size}
+        Receiver(const std::string &source_address, const int receive_port)
         {
             // Generate socket
             // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
@@ -162,9 +160,8 @@ namespace udp_lib
          * @brief Construct a new UDPLib object, can receive from any ip-address 
          * 
          * @param receive_port 
-         * @param max_msg_byte_size : Maximum message buffer size when receiving
          */
-        Receiver(const int receive_port, const int max_msg_byte_size = 512) : max_msg_byte_size_{max_msg_byte_size}
+        Receiver(const int receive_port)
         {
             // Generate socket
             // AF_INET: IPV4, SOCK_DGRAM: UDP, 0: protocol is automoatically chosen
