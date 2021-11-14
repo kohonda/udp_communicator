@@ -95,7 +95,6 @@ namespace udp_lib
 			WSACleanup();
 		}
 
-
 		template <typename MSG_TYPE>
 		void udp_send(const MSG_TYPE &msg) const
 		{
@@ -105,8 +104,6 @@ namespace udp_lib
 				exit(1);
 			}
 		}
-
-
 	};
 
 	class Receiver
@@ -114,7 +111,6 @@ namespace udp_lib
 	private:
 		SOCKET sock_;
 		struct sockaddr_in addr_;
-
 
 	public:
 		/*** @brief Construct a Receiver object, normal usage
@@ -152,15 +148,13 @@ namespace udp_lib
 			}
 		}
 
-
 		~Receiver()
 		{
 			closesocket(sock_);
 			WSACleanup();
 		}
 
-
-		template<typename MSG_TYPE>
+		template <typename MSG_TYPE>
 		bool udp_receive(MSG_TYPE *msg) const
 		{
 			bool is_receive_msg = false;
